@@ -8,6 +8,10 @@ public class Cliente {
 	private String aniosCliente;
 	private CategoriaEnum nombreCategoria;
 	
+	public Cliente() {
+		
+	}
+	
 	public Cliente(String runCliente, String nombreCliente, String apellidoCliente, String aniosCliente) {
 		super();
 		this.runCliente = runCliente;
@@ -56,6 +60,14 @@ public class Cliente {
 	public void setNombreCategoria(CategoriaEnum nombreCategoria) {
 		this.nombreCategoria = nombreCategoria;
 	}
+
+	@Override
+	public String toString() {
+		return "Cliente [runCliente=" + runCliente + ", nombreCliente=" + nombreCliente + ", apellidoCliente="
+				+ apellidoCliente + ", aniosCliente=" + aniosCliente + ", nombreCategoria=" + nombreCategoria + "]";
+	}
+	
+	
 	
 	
 	
