@@ -1,5 +1,6 @@
 package vista;
 
+
 import java.util.Scanner;
 
 import modelo.CategoriaEnum;
@@ -8,16 +9,21 @@ import servicio.ArchivoServicio;
 import servicio.ClienteServicio;
 import servicio.ExportadorCsv;
 import servicio.ExportadorTxt;
+import utilidades.Utilidad;
 
 public class Menu implements MetodosMenu {
 
 	private ClienteServicio clienteServicio = new ClienteServicio();
-	private ArchivoServicio archivoServicio;
+	private ArchivoServicio archivoServicio = new ArchivoServicio();
 	private ExportadorCsv exportadorCsv;
 	private ExportadorTxt exportadorTxt;
 	private String fileName = "Clientes"; // Para exportar el archivo
 	private String fileName1 = "DBClientes.csv"; // Para importar el archivo
 	private Scanner scanner = new Scanner(System.in);
+	
+	public Menu() {
+
+	}
 
 	public void iniciarMenu() {
 		int opcion = 0;
@@ -35,7 +41,7 @@ public class Menu implements MetodosMenu {
 			opcion = scanner.nextInt();
 			scanner.nextLine();
 
-			switch (opcion) {
+			switch (opcion) { //Switch para llamar a los métodos
 			case 1:
 				listarCliente();
 				break;
@@ -88,7 +94,8 @@ public class Menu implements MetodosMenu {
 
 	@Override
 	public void editarCliente() {
-		int opcion = 0, op = 0, posicion = -1, contador = 0; //Se definen las variables para las opciones que se van a seleccionar
+		int opcion = 0, op = 0, posicion = -1, contador = 0; // Se definen las variables para las opciones que se van a
+		Cliente client = new Cliente();                      // seleccionar
 		String run = "";
 		do {
 			System.out.println("-------------Editar Cliente-------------");
@@ -100,18 +107,19 @@ public class Menu implements MetodosMenu {
 			scanner.nextLine();
 
 			System.out.println("\n----------------------------------------");
-			System.out.println("\nIngrese RUN del Cliente a editar:"); //Se ingresa el RUN del cliente a editar
+			System.out.println("\nIngrese RUN del Cliente a editar:"); // Se ingresa el RUN del cliente a editar
 			run = scanner.nextLine();
 
 			for (Cliente list : clienteServicio.getListaClientes()) {
-				if (list.getRunCliente().equals(run)) { //Buscamos la ubicación en la lista del cliente a editar
+				if (list.getRunCliente().equals(run)) { // Buscamos la ubicación en la lista del cliente a editar
 					posicion = contador;
 				}
 				contador++;
 			}
 
-			if (posicion >= 0) { //Si la pocicion es mayor o igual a cero significa que encontró un cliente
-				Cliente client = clienteServicio.getListaClientes().get(posicion);
+			if (posicion >= 0) { // Si la pocicion es mayor o igual a cero significa que encontró un cliente
+				client = clienteServicio.getListaClientes().get(posicion);
+
 				if (opcion == 1) {
 					do {
 						System.out.println("\n-----Actualizando estado del Cliente----");
@@ -122,9 +130,9 @@ public class Menu implements MetodosMenu {
 
 						op = scanner.nextInt();
 						scanner.nextLine();
-						System.out.println("----------------------------------------");
+						// System.out.println("----------------------------------------");
 						if (op == 1) {
-							client.setNombreCategoria(CategoriaEnum.INACTIVO); //Cambiamos el estado a inactivo
+							client.setNombreCategoria(CategoriaEnum.INACTIVO); // Cambiamos el estado a inactivo
 						} else if (op == 2) {
 							client.setNombreCategoria(CategoriaEnum.ACTIVO);
 						}
@@ -133,11 +141,54 @@ public class Menu implements MetodosMenu {
 
 				} else if (opcion == 2) {
 
+					do {
+						System.out.println("----Actualizando datos del Cliente-----");
+						System.out.println("\n1.-El RUN del Cliente es: " + client.getRunCliente());
+						System.out.println("2.-El Nombre del Cliente es: " + client.getNombreCliente());
+						System.out.println("3.-El Apellido del Cliente es: " + client.getApellidoCliente());
+						System.out.println("4.-Los años como Cliente son: " + client.getAniosCliente());
+						System.out.println("\nIngrese opcion a editar de los datos del cliente:");
+						op = scanner.nextInt();
+						scanner.nextLine();
+						
+
+						switch (op) { //Switch para setear los atributos según la opción seleccionada
+						case 1:
+							System.out.println("\n1.-Ingrese nuevo RUN del Cliente:");
+							String run2 = scanner.nextLine();
+							client.setRunCliente(run2);
+							break;
+						case 2:
+							System.out.println("2.-Ingrese nuevo Nombre del Cliente:");
+							String name = scanner.nextLine();
+							client.setNombreCliente(name);
+							break;
+						case 3:
+							System.out.println("3.-Ingrese nuevo Apellido del Cliente:");
+							String surname = scanner.nextLine();
+							client.setApellidoCliente(surname);
+							break;
+						case 4:
+							System.out.println("4.-Ingrese nuevos años como Cliente:");
+							String years = scanner.nextLine();
+							client.setAniosCliente(years);
+							break;
+						default:
+							System.out.println("Opción ingresada no válida");
+						}
+
+					} while (op < 1 || op > 4);
+
 				}
 
 			} else {
-				System.out.println("El cliente no se encuentra en la lista"); //Si la posicion se mantiene con el valor inicial no existe el cliente buscado
+				System.out.println("El cliente no se encuentra en la lista"); // Si la posicion se mantiene con el valor
+																				// inicial no existe el cliente buscado
 			}
+
+			clienteServicio.editarCliente(posicion, client);
+			System.out.println("----------------------------------------");
+			System.out.println("Datos cambiados con éxito");
 
 		} while (opcion < 1 || opcion > 2);
 
@@ -145,20 +196,58 @@ public class Menu implements MetodosMenu {
 
 	@Override
 	public void importarDatos() {
-		// TODO Auto-generated method stub
+		System.out.println("---------Cargar Datos en Windows---------------");
+		System.out.println("\nIngresa la ruta en donde se encuentra el archivo DBClientes.csv:");
+		String ruta = scanner.nextLine().trim();
+		String rutaArchivo = ruta + "\\" + this.fileName1;
+		this.archivoServicio = new ArchivoServicio();
+		archivoServicio.cargarDatos(rutaArchivo, clienteServicio.getListaClientes()); //Pasamos la ruta y la lista para cargar info
+		
+		
 
 	}
 
 	@Override
 	public void exportarDatos() {
-		// TODO Auto-generated method stub
+		int op = 0;
+		do {
+			System.out.println("---------Exportar Datos-----------");
+			System.out.println("Seleccione el formato a exportar:");
+			System.out.println("1.-Formato csv");
+			System.out.println("2.-Formato txt");
+			System.out.println("\nIngrese una opción para exportar:");
+			System.out.println("----------------------------------");
+			op = scanner.nextInt();
+			scanner.nextLine();
+
+		} while (op < 1 || op > 2);
+		
+		if(op == 1) {
+			System.out.println("---------Exportar Datos en Windows---------------");
+			System.out.println("Ingresa la ruta en donde desea exportar el archivo clientes.csv:");
+			String ruta = scanner.nextLine().trim();
+			String rutaArchivo = ruta + "\\" + this.fileName + ".csv";
+			this.exportadorCsv = new ExportadorCsv();
+			exportadorCsv.exportar(rutaArchivo, clienteServicio.getListaClientes()); //Enviamos ruta y lista clientes
+		}else if(op == 2) {
+			System.out.println("---------Exportar Datos en Windows---------------");
+			System.out.println("Ingresa la ruta en donde desea exportar el archivo clientes.txt:");
+			String ruta = scanner.nextLine().trim();
+			String rutaArchivo = ruta + "\\" + this.fileName + ".txt";
+			this.exportadorTxt = new ExportadorTxt();
+			exportadorTxt.exportar(rutaArchivo, clienteServicio.getListaClientes()); //Enviamos ruta y lista clientes
+		}
+		
+		
 
 	}
 
 	@Override
-	public void terminarPrograma() {
-		// TODO Auto-generated method stub
+	public void terminarPrograma() { //Aqui procedemos a cerrar el programa
+		Utilidad util = new Utilidad();
+		util.limpiarPantalla(); //Limpiamos y mostramos mensaje
+		util.mostrarMensaje();
 
 	}
-
+	
 }
